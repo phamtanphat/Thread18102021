@@ -19,12 +19,22 @@ public class MainActivity extends AppCompatActivity {
 
         a = b = c = 0;
 
+        // index = 0 => A sẽ chạy
+        // index = 1 => B sẽ chạy
+        // index = 2 => C sẽ chạy
+
         Thread threadA = new Thread(new Runnable() {
             @Override
             public void run() {
-                for (int i = 1; i <= 100; i++) {
-                    a = i;
-                    Log.d("BBB","A : " + a);
+                synchronized (myFlag){
+                    for (int i = 1; i <= 100; i++) {
+                        if (myFlag.index == 0){
+                            a = i;
+                            Log.d("BBB","A : " + a);
+                            myFlag.index = 1;
+                        }
+
+                    }
                 }
             }
         });
@@ -32,9 +42,14 @@ public class MainActivity extends AppCompatActivity {
         Thread threadB = new Thread(new Runnable() {
             @Override
             public void run() {
-                for (int i = 1; i <= 100; i++) {
-                    b = i;
-                    Log.d("BBB","B : " + b);
+                synchronized (myFlag){
+                    for (int i = 1; i <= 100; i++) {
+                       if (myFlag.index == 1){
+                           b = i;
+                           Log.d("BBB","B : " + b);
+                           myFlag.index = 2;
+                       }
+                    }
                 }
             }
         });
@@ -42,9 +57,14 @@ public class MainActivity extends AppCompatActivity {
         Thread threadC = new Thread(new Runnable() {
             @Override
             public void run() {
-                for (int i = 1; i <= 100; i++) {
-                    c = a + b;
-                    Log.d("BBB","C : " + c);
+                synchronized (myFlag){
+                    for (int i = 1; i <= 100; i++) {
+                        if (myFlag.index == 2){
+                            c = a + b;
+                            Log.d("BBB","C : " + c);
+                            myFlag.index = 0;
+                        }
+                    }
                 }
             }
         });
