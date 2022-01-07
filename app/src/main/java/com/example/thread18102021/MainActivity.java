@@ -8,30 +8,54 @@ import android.util.Log;
 
 public class MainActivity extends AppCompatActivity {
 
+    Object objA , objB;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        objA = new Object();
+        objB = new Object();
+
         Thread threadA = new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.d("BBB","Thread A ");
+                synchronized (objA){
+                    Log.d("BBB","Thread A is running");
+                    try {
+                        Thread.sleep(10);
+                        synchronized (objB){
+                            Log.d("BBB","hanlde object B");
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
-
 
         Thread threadB = new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.d("BBB","Thread B " );
+                synchronized (objB){
+                    Log.d("BBB","Thread B is running");
+                    try {
+                        Thread.sleep(10);
+                        synchronized (objA){
+                            Log.d("BBB","hanlde object A");
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
 
         threadA.start();
         threadB.start();
 
-        new CountDownTimer(1000,500) {
+        new CountDownTimer(2000,10){
+
             @Override
             public void onTick(long millisUntilFinished) {
 
@@ -39,9 +63,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFinish() {
-                Log.d("BBB","State Thread A : " + threadA.getState());
-                Log.d("BBB","State Thread B : " + threadB.getState());
+                Log.d("BBB","State Thread A " + threadA.getState());
+                Log.d("BBB","State Thread B " + threadB.getState());
             }
         }.start();
     }
+
 }
